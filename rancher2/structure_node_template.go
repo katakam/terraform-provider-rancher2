@@ -18,6 +18,10 @@ func flattenNodeTemplate(d *schema.ResourceData, in *NodeTemplate) error {
 	d.Set("driver", in.Driver)
 
 	switch in.Driver {
+	case packetConfigDriver:
+		if in.PacketConfig == nil {
+			return fmt.Errorf("[ERROR] Node template driver %s requires packet_config", in.Driver)
+		}
 	case amazonec2ConfigDriver:
 		if in.Amazonec2Config == nil {
 			return fmt.Errorf("[ERROR] Node template driver %s requires amazonec2_config", in.Driver)
@@ -145,7 +149,10 @@ func expandNodeTemplate(in *schema.ResourceData) *NodeTemplate {
 		obj.ID = v
 	}
 	obj.Name = in.Get("name").(string)
-
+	if v, ok := in.Get("packet_config").([]interface{}); ok && len(v) > 0 {
+		obj.PacketConfig = expandPacketConfig(v)
+		obj.Driver = packetConfigDriver
+	}
 	if v, ok := in.Get("amazonec2_config").([]interface{}); ok && len(v) > 0 {
 		obj.Amazonec2Config = expandAmazonec2Config(v)
 		obj.Driver = amazonec2ConfigDriver

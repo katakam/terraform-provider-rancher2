@@ -21,6 +21,15 @@ func flattenCloudCredential(d *schema.ResourceData, in *CloudCredential) error {
 
 	driver := d.Get("driver").(string)
 	switch driver {
+	case packetConfigDriver:
+		v, ok := d.Get("packet_credential_config").([]interface{})
+		if !ok {
+			v = []interface{}{}
+		}
+		err := d.Set("packet_credential_config", flattenCloudCredentialPacket(in.PacketCredentialConfig, v))
+		if err != nil {
+			return err
+		}
 	case amazonec2ConfigDriver:
 		v, ok := d.Get("amazonec2_credential_config").([]interface{})
 		if !ok {
@@ -177,6 +186,10 @@ func expandCloudCredential(in *schema.ResourceData) *CloudCredential {
 
 	if v, ok := in.Get("labels").(map[string]interface{}); ok && len(v) > 0 {
 		obj.Labels = toMapString(v)
+	}
+	if v, ok := in.Get("packet_credential_config").([]interface{}); ok && len(v) > 0 {
+		obj.PacketCredentialConfig = expandCloudCredentialPacket(v)
+		in.Set("driver", packetConfigDriver)
 	}
 
 	return obj

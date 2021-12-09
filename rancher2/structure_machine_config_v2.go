@@ -25,6 +25,7 @@ type machineConfigV2 struct {
 	LinodeConfig        *MachineConfigV2Linode        `json:"linodeConfig,omitempty" yaml:"linodeConfig,omitempty"`
 	OpenstackConfig     *MachineConfigV2Openstack     `json:"openstackConfig,omitempty" yaml:"openstackConfig,omitempty"`
 	VmwarevsphereConfig *MachineConfigV2Vmwarevsphere `json:"vmwarevsphereConfig,omitempty" yaml:"vmwarevsphereConfig,omitempty"`
+	PacketConfig        *MachineConfigV2Packet        `json:"packetConfig,omitempty" yaml:"packetConfig,omitempty"`
 }
 
 type MachineConfigV2 struct {
@@ -71,6 +72,12 @@ func flattenMachineConfigV2(d *schema.ResourceData, in *MachineConfigV2) error {
 		if err != nil {
 			return err
 		}
+	case machineConfigV2PacketKind:
+		err := d.Set("packet_config", flattenMachineConfigV2Packet(in.PacketConfig))
+		if err != nil {
+			return err
+		}
+
 	default:
 		return fmt.Errorf("[ERROR] Unsupported driver on node template: %s", kind)
 	}
@@ -132,6 +139,9 @@ func expandMachineConfigV2(in *schema.ResourceData) *MachineConfigV2 {
 	}
 	if v, ok := in.Get("vsphere_config").([]interface{}); ok && len(v) > 0 {
 		obj.VmwarevsphereConfig = expandMachineConfigV2Vmwarevsphere(v, obj)
+	}
+	if v, ok := in.Get("packet_config").([]interface{}); ok && len(v) > 0 {
+		obj.PacketConfig = expandMachineConfigV2Packet(v, obj)
 	}
 
 	return obj

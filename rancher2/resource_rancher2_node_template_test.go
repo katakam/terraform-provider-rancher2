@@ -187,6 +187,25 @@ resource "` + testAccRancher2NodeTemplateType + `" "foo-vsphere" {
   }
 }
 `
+	testAccRancher2NodeTemplatePacketUpdate = `
+resource "` + testAccRancher2NodeTemplateType + `" "foo-packet" {
+  name = "foo-packet"
+  description = "Terraform node driver packet acceptance test - updated"
+  packet_config {
+    api_key="afdjK9cU9WhP2LsMiXZUSDQkhU"
+    plan="c3.small.x86"
+    hw_reservation-id="none"
+    os_ubuntu_20_0"
+    facility_code="sv15"
+    project_id="_2afad"
+    spot_instance= false
+    spot_price-max="10"
+    metro_code="sv"
+    ua_prefix="2_iiiidf"
+    userdata="adjf"
+  }
+}
+`
 	testAccRancher2NodeTemplateVsphereConfig       = testAccRancher2CloudCredentialConfigVsphere + testAccRancher2NodeTemplateVsphere
 	testAccRancher2NodeTemplateVsphereUpdateConfig = testAccRancher2CloudCredentialConfigVsphere + testAccRancher2NodeTemplateVsphereUpdate
 )
@@ -582,6 +601,71 @@ func TestAccRancher2NodeTemplate_disappears_Vsphere(t *testing.T) {
 				Config: testAccRancher2NodeTemplateVsphereConfig,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckRancher2NodeTemplateExists(testAccRancher2NodeTemplateType+".foo-vsphere", nodeTemplate),
+					testAccRancher2NodeTemplateDisappears(nodeTemplate),
+				),
+				ExpectNonEmptyPlan: true,
+			},
+		},
+	})
+}
+func TestAccRancher2NodeTemplate_basic_Packet(t *testing.T) {
+	var nodeTemplate *NodeTemplate
+
+	name := testAccRancher2NodeTemplateType + ".foo-packet"
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckRancher2NodeTemplateDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccRancher2NodeTemplateDigitaloceanConfig,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckRancher2NodeTemplateExists(name, nodeTemplate),
+					resource.TestCheckResourceAttr(name, "name", "foo-packet"),
+					resource.TestCheckResourceAttr(name, "description", "Terraform node driver packet acceptance test"),
+					resource.TestCheckResourceAttr(name, "driver", packetConfigDriver),
+					resource.TestCheckResourceAttr(name, "packet_config.0.billing", "hourly"),
+					resource.TestCheckResourceAttr(name, "packet_config.0.plan", "c3.small.x86"),
+				),
+			},
+			{
+				Config: testAccRancher2NodeTemplateDigitaloceanUpdateConfig,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckRancher2NodeTemplateExists(name, nodeTemplate),
+					resource.TestCheckResourceAttr(name, "name", "foo-do2"),
+					resource.TestCheckResourceAttr(name, "description", "Terraform node driver digitalocean acceptance test - updated"),
+					resource.TestCheckResourceAttr(name, "driver", digitaloceanConfigDriver),
+					resource.TestCheckResourceAttr(name, "digitalocean_config.0.image", "image-YYYYYYYY"),
+					resource.TestCheckResourceAttr(name, "digitalocean_config.0.region", "region-YYYYYYYY"),
+				),
+			},
+			{
+				Config: testAccRancher2NodeTemplateDigitaloceanConfig,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckRancher2NodeTemplateExists(name, nodeTemplate),
+					resource.TestCheckResourceAttr(name, "name", "foo-do"),
+					resource.TestCheckResourceAttr(name, "description", "Terraform node driver digitalocean acceptance test"),
+					resource.TestCheckResourceAttr(name, "driver", digitaloceanConfigDriver),
+					resource.TestCheckResourceAttr(name, "digitalocean_config.0.image", "image-XXXXXXXX"),
+					resource.TestCheckResourceAttr(name, "digitalocean_config.0.region", "region-XXXXXXXX"),
+				),
+			},
+		},
+	})
+}
+
+func TestAccRancher2NodeTemplate_disappears_Packet(t *testing.T) {
+	var nodeTemplate *NodeTemplate
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckRancher2NodeTemplateDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccRancher2NodeTemplateDigitaloceanConfig,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckRancher2NodeTemplateExists(testAccRancher2NodeTemplateType+".foo-do", nodeTemplate),
 					testAccRancher2NodeTemplateDisappears(nodeTemplate),
 				),
 				ExpectNonEmptyPlan: true,

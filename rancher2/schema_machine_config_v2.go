@@ -24,7 +24,7 @@ func machineConfigV2Fields() map[string]*schema.Schema {
 			Type:          schema.TypeList,
 			MaxItems:      1,
 			Optional:      true,
-			ConflictsWith: []string{"azure_config", "digitalocean_config", "linode_config", "openstack_config", "vsphere_config"},
+			ConflictsWith: []string{"azure_config", "digitalocean_config", "linode_config", "openstack_config", "vsphere_config", "packet_config"},
 			Elem: &schema.Resource{
 				Schema: machineConfigV2Amazonec2Fields(),
 			},
@@ -33,7 +33,7 @@ func machineConfigV2Fields() map[string]*schema.Schema {
 			Type:          schema.TypeList,
 			MaxItems:      1,
 			Optional:      true,
-			ConflictsWith: []string{"amazonec2_config", "digitalocean_config", "linode_config", "openstack_config", "vsphere_config"},
+			ConflictsWith: []string{"amazonec2_config", "digitalocean_config", "linode_config", "openstack_config", "vsphere_config", "packet_config"},
 			Elem: &schema.Resource{
 				Schema: machineConfigV2AzureFields(),
 			},
@@ -42,7 +42,7 @@ func machineConfigV2Fields() map[string]*schema.Schema {
 			Type:          schema.TypeList,
 			MaxItems:      1,
 			Optional:      true,
-			ConflictsWith: []string{"amazonec2_config", "azure_config", "linode_config", "openstack_config", "vsphere_config"},
+			ConflictsWith: []string{"amazonec2_config", "azure_config", "linode_config", "openstack_config", "vsphere_config", "packet_config"},
 			Elem: &schema.Resource{
 				Schema: machineConfigV2DigitaloceanFields(),
 			},
@@ -59,7 +59,7 @@ func machineConfigV2Fields() map[string]*schema.Schema {
 			Type:          schema.TypeList,
 			MaxItems:      1,
 			Optional:      true,
-			ConflictsWith: []string{"amazonec2_config", "azure_config", "digitalocean_config", "openstack_config", "vsphere_config"},
+			ConflictsWith: []string{"amazonec2_config", "azure_config", "digitalocean_config", "openstack_config", "vsphere_config", "packet_config"},
 			Elem: &schema.Resource{
 				Schema: machineConfigV2LinodeFields(),
 			},
@@ -68,7 +68,7 @@ func machineConfigV2Fields() map[string]*schema.Schema {
 			Type:          schema.TypeList,
 			MaxItems:      1,
 			Optional:      true,
-			ConflictsWith: []string{"amazonec2_config", "azure_config", "digitalocean_config", "linode_config", "vsphere_config"},
+			ConflictsWith: []string{"amazonec2_config", "azure_config", "digitalocean_config", "linode_config", "vsphere_config", "packet_config"},
 			Elem: &schema.Resource{
 				Schema: machineConfigV2OpenstackFields(),
 			},
@@ -77,9 +77,18 @@ func machineConfigV2Fields() map[string]*schema.Schema {
 			Type:          schema.TypeList,
 			MaxItems:      1,
 			Optional:      true,
-			ConflictsWith: []string{"amazonec2_config", "azure_config", "digitalocean_config", "linode_config", "openstack_config"},
+			ConflictsWith: []string{"amazonec2_config", "azure_config", "digitalocean_config", "linode_config", "openstack_config", "packet_config"},
 			Elem: &schema.Resource{
 				Schema: machineConfigV2VmwarevsphereFields(),
+			},
+		},
+		"packet_config": {
+			Type:          schema.TypeList,
+			MaxItems:      1,
+			Optional:      true,
+			ConflictsWith: []string{"amazonec2_config", "azure_config", "digitalocean_config", "linode_config", "openstack_config", "vsphere_config"},
+			Elem: &schema.Resource{
+				Schema: machineConfigV2PacketFields(),
 			},
 		},
 	}

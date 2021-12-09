@@ -156,6 +156,15 @@ resource "` + testAccRancher2CloudCredentialType + `" "foo-vsphere" {
   }
 }
  `
+	testAccRancher2CloudCredentialConfigMetal = `
+resource "` + testAccRancher2CloudCredentialType + `" "foo-metal" {
+  name = "foo-metal"
+  description= "Terraform cloudCredential acceptance test"
+  metal_credential_config {
+    apiKey = "XXXXXXXXXXXXXXXXXXXX"
+  }
+}
+`
 )
 
 func TestAccRancher2CloudCredential_basic_Amazonec2(t *testing.T) {
@@ -596,6 +605,47 @@ func TestAccRancher2CloudCredential_disappears_Vsphere(t *testing.T) {
 					testAccRancher2CloudCredentialDisappears(cloudCredential),
 				),
 				ExpectNonEmptyPlan: true,
+			},
+		},
+	})
+}
+func TestAccRancher2CloudCredential_basic_Metal(t *testing.T) {
+	var cloudCredential *CloudCredential
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckRancher2CloudCredentialDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccRancher2CloudCredentialConfigMetal,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckRancher2CloudCredentialExists(testAccRancher2CloudCredentialType+".foo-metal", cloudCredential),
+					resource.TestCheckResourceAttr(testAccRancher2CloudCredentialType+".foo-metal", "name", "foo-metal"),
+					resource.TestCheckResourceAttr(testAccRancher2CloudCredentialType+".foo-metal", "description", "Terraform cloudCredential acceptance test"),
+					resource.TestCheckResourceAttr(testAccRancher2CloudCredentialType+".foo-metal", "driver", packetConfigDriver),
+					resource.TestCheckResourceAttr(testAccRancher2CloudCredentialType+".foo-meta", "metal_credential_config.0.apiKey", "XXXXXXXXXXXXXXXXXXXX"),
+				),
+			},
+			{
+				Config: testAccRancher2CloudCredentialUpdateConfigDigitalocean,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckRancher2CloudCredentialExists(testAccRancher2CloudCredentialType+".foo-do", cloudCredential),
+					resource.TestCheckResourceAttr(testAccRancher2CloudCredentialType+".foo-do", "name", "foo-metal"),
+					resource.TestCheckResourceAttr(testAccRancher2CloudCredentialType+".foo-do", "description", "Terraform cloudCredential acceptance test - updated"),
+					resource.TestCheckResourceAttr(testAccRancher2CloudCredentialType+".foo-do", "driver", digitaloceanConfigDriver),
+					resource.TestCheckResourceAttr(testAccRancher2CloudCredentialType+".foo-do", "digitalocean_credential_config.0.access_token", "YYYYYYYYYYYYYYYYYYYY"),
+				),
+			},
+			{
+				Config: testAccRancher2CloudCredentialConfigDigitalocean,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckRancher2CloudCredentialExists(testAccRancher2CloudCredentialType+".foo-do", cloudCredential),
+					resource.TestCheckResourceAttr(testAccRancher2CloudCredentialType+".foo-do", "name", "foo-do"),
+					resource.TestCheckResourceAttr(testAccRancher2CloudCredentialType+".foo-do", "description", "Terraform cloudCredential acceptance test"),
+					resource.TestCheckResourceAttr(testAccRancher2CloudCredentialType+".foo-do", "driver", digitaloceanConfigDriver),
+					resource.TestCheckResourceAttr(testAccRancher2CloudCredentialType+".foo-do", "digitalocean_credential_config.0.access_token", "XXXXXXXXXXXXXXXXXXXX"),
+				),
 			},
 		},
 	})

@@ -148,6 +148,8 @@ func resourceRancher2NodeTemplateUpdate(d *schema.ResourceData, meta interface{}
 		update["hetznerConfig"] = expandHetznercloudConfig(d.Get("hetzner_config").([]interface{}))
 	case vmwarevsphereConfigDriver:
 		update["vmwarevsphereConfig"] = expandVsphereConfig(d.Get("vsphere_config").([]interface{}))
+	case packetConfigDriver:
+		update["packetConfig"] = expandPacketConfig(d.Get("packet_config").([]interface{}))
 	}
 
 	newNodeTemplate := &NodeTemplate{}
